@@ -1,21 +1,24 @@
-﻿using System.Data.SQLite;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 namespace Logging
 {
-    public partial class Log
+    public class Log
     {
         
-        private const string _databaseName = "DiscordBotDatabase";
-        private EmailSender _emailSender;
-        private static ILogRecorder _logRecorder = new SQLiteLogs();
+        private const string _databaseName = "LogDatabase";
+        private static ILogRecorder _logRecorder;
 
-        public Log()
+        public Log(RecorderType recorderType)
         {
-            //_logRecorder = new SQLiteLogs(); 
-            _logRecorder.StartUp();
-            //_emailSender = new EmailSender();
-            //_emailSender.SendEmail("test", "testifthisisworking", "dbotham16@outlook.com");
+            switch (recorderType)
+            {
+                case RecorderType.SQLLite:
+                    _logRecorder = new SQLiteLogs(_databaseName);
+                    return; 
+                case RecorderType.PostGres:
+                    _logRecorder = new PostGresLogs();
+                    return;
+            }
         }
 
         public static void Fatal(string message, string payload = "", [CallerFilePath] string filePath = "", [CallerMemberName] string function = "") =>
@@ -40,7 +43,7 @@ namespace Logging
         public static void Trace(string message, string payload = "", [CallerFilePath] string filePath = "", [CallerMemberName] string function = "") =>
              _logRecorder.CreateLog(LogType.Trace, filePath, function, message, payload);
 
-        private static string GetClassName(string filePath)
+        public static string GetClassName(string filePath)
         {
             int index = filePath.LastIndexOf("\\") + 1;
             return filePath.Substring(index, filePath.LastIndexOf(".") - index);

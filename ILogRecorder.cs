@@ -7,12 +7,7 @@ using System.Threading.Tasks;
 namespace Logging
 {
     interface ILogRecorder
-    {
-        /// <summary>
-        /// Called to run start up proceedures for the class handling logging. 
-        /// </summary>
-        public void StartUp();
-
+    { 
         /// <summary>
         /// Adds the created log to storage
         /// </summary>
